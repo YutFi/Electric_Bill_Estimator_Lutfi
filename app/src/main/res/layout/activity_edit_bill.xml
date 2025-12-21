@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:orientation="vertical"
+    android:background="@color/backgroundLight">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit Details"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView android:text="Month" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <Spinner
+        android:id="@+id/editSpinnerMonth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView android:text="Units (kWh)" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <EditText
+        android:id="@+id/editEtUnits"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView android:text="Rebate (%)" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <Spinner
+        android:id="@+id/editSpinnerRebate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:id="@+id/editTvError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/errorRed"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnEditSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Changes"
+        android:backgroundTint="@color/colorPrimary"/>
+
+</LinearLayout>
