@@ -136,7 +136,7 @@
                 android:id="@+id/tvUrl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="https://github.com/YutFi/Electric_Bill_Estimator_Lutfi.git"
+                android:text="https://github.com/YutFi/Electric_Bill_Estimator_Lutfi"
                 android:autoLink="web"
                 android:textColorLink="#2196F3"
                 android:textSize="16sp"
