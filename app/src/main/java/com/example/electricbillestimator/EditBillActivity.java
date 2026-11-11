@@ -2,57 +2,96 @@ package com.example.electricbillestimator;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.slider.Slider;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class EditBillActivity extends AppCompatActivity {
 
     private BillDatabaseHelper dbHelper;
     private long billId;
 
-    private Spinner spinnerMonth, spinnerRebate;
-    private EditText etUnits;
-    private TextView tvError;
+    private AutoCompleteTextView dropdownMonth;
+    private TextInputLayout tilUnits;
+    private TextInputEditText etUnits;
+    private Slider sliderRebate;
+    private TextView tvRebateValue, tvPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_bill);
-
-        if(getSupportActionBar() != null) getSupportActionBar().setTitle("Edit Bill");
+        Ui.applySystemBarInsets(findViewById(R.id.main));
+        Ui.setupToolbar(this, R.string.title_edit);
 
         dbHelper = new BillDatabaseHelper(this);
         billId = getIntent().getLongExtra("BILL_ID", -1);
 
-        spinnerMonth = findViewById(R.id.editSpinnerMonth);
-        spinnerRebate = findViewById(R.id.editSpinnerRebate);
+        dropdownMonth = findViewById(R.id.editDropdownMonth);
+        tilUnits = findViewById(R.id.editTilUnits);
         etUnits = findViewById(R.id.editEtUnits);
-        tvError = findViewById(R.id.editTvError);
-        Button btnSave = findViewById(R.id.btnEditSave);
+        sliderRebate = findViewById(R.id.editSliderRebate);
+        tvRebateValue = findViewById(R.id.editTvRebateValue);
+        tvPreview = findViewById(R.id.editTvPreview);
+        MaterialButton btnSave = findViewById(R.id.btnEditSave);
 
-        setupSpinners();
+        dropdownMonth.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Ui.MONTHS));
+
         loadExistingData();
 
+        etUnits.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                tilUnits.setError(null);
+                updatePreview();
+            }
+        });
+        sliderRebate.addOnChangeListener((slider, value, fromUser) -> {
+            tvRebateValue.setText(((int) value) + "%");
+            updatePreview();
+        });
+
         btnSave.setOnClickListener(v -> updateRecord());
+
+        if (savedInstanceState == null) {
+            Ui.popIn(findViewById(R.id.cardEdit), 0);
+            Ui.popIn(btnSave, 140);
+        }
     }
 
-    private void setupSpinners() {
-        String[] months = {"January","February","March","April","May","June",
-                "July","August","September","October","November","December"};
-        ArrayAdapter<String> monthAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item, months);
-        spinnerMonth.setAdapter(monthAdapter);
+    private String unitsText() {
+        return etUnits.getText() == null ? "" : etUnits.getText().toString().trim();
+    }
 
-        String[] rebates = {"0","1","2","3","4","5"};
-        ArrayAdapter<String> rebateAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item, rebates);
-        spinnerRebate.setAdapter(rebateAdapter);
+    private void updatePreview() {
+        String raw = unitsText();
+        if (Ui.unitsError(raw) != 0) {
+            tvPreview.setText(getString(R.string.preview_final, "–"));
+            return;
+        }
+        double total = BillCalculator.calculateTotalCharges(Integer.parseInt(raw));
+        double fin = BillCalculator.calculateFinalCost(total, (int) sliderRebate.getValue());
+        tvPreview.setText(getString(R.string.preview_final, Ui.money(fin)));
     }
 
     private void loadExistingData() {
@@ -61,58 +100,48 @@ public class EditBillActivity extends AppCompatActivity {
             String month = c.getString(c.getColumnIndexOrThrow(BillDatabaseHelper.COL_MONTH));
             int units = c.getInt(c.getColumnIndexOrThrow(BillDatabaseHelper.COL_UNITS));
             double rebate = c.getDouble(c.getColumnIndexOrThrow(BillDatabaseHelper.COL_REBATE));
-
-            etUnits.setText(String.valueOf(units));
-
-            // Set Spinner Selections
-            setSpinnerValue(spinnerMonth, month);
-            setSpinnerValue(spinnerRebate, String.valueOf((int)rebate));
-
             c.close();
+
+            dropdownMonth.setText(month, false);
+            etUnits.setText(String.valueOf(units));
+            int r = (int) Math.max(0, Math.min(5, Math.round(rebate)));
+            sliderRebate.setValue(r);
+            tvRebateValue.setText(r + "%");
+            updatePreview();
         } else {
-            Toast.makeText(this, "Record not found.", Toast.LENGTH_SHORT).show();
+            if (c != null) c.close();
+            Toast.makeText(this, R.string.msg_not_found, Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
-    private void setSpinnerValue(Spinner spinner, String value) {
-        for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(value)) {
-                spinner.setSelection(i);
-                break;
-            }
-        }
-    }
-
     private void updateRecord() {
-        tvError.setVisibility(View.GONE);
-        String unitsStr = etUnits.getText().toString().trim();
-
-        if (unitsStr.isEmpty()) {
-            tvError.setText("Please enter units.");
-            tvError.setVisibility(View.VISIBLE);
+        String raw = unitsText();
+        int errorRes = Ui.unitsError(raw);
+        if (errorRes != 0) {
+            tilUnits.setError(getString(errorRes));
+            Ui.shake(tilUnits);
             return;
         }
 
-        int units = Integer.parseInt(unitsStr);
-        if(units < 0) {
-            tvError.setText("Units cannot be negative.");
-            tvError.setVisibility(View.VISIBLE);
-            return;
-        }
+        int units = Integer.parseInt(raw);
+        int rebatePercent = (int) sliderRebate.getValue();
+        String month = dropdownMonth.getText().toString();
 
-        int rebatePercent = Integer.parseInt(spinnerRebate.getSelectedItem().toString());
-        String month = spinnerMonth.getSelectedItem().toString();
-
-        // Recalculate
         double total = BillCalculator.calculateTotalCharges(units);
         double finalCost = BillCalculator.calculateFinalCost(total, rebatePercent);
 
         if (dbHelper.updateBill(billId, month, units, rebatePercent, total, finalCost)) {
-            Toast.makeText(this, "Bill Updated Successfully!", Toast.LENGTH_SHORT).show();
-            finish(); // Close activity and return to details
+            Toast.makeText(this, R.string.msg_updated, Toast.LENGTH_SHORT).show();
+            finish();
         } else {
-            Toast.makeText(this, "Update failed.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.msg_update_failed, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbHelper.close();
     }
 }

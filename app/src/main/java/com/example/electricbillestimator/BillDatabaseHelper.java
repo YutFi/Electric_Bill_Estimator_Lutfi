@@ -40,8 +40,8 @@ public class BillDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        onCreate(db);
+        // Schema has not changed since version 1. Saved bills are kept; add ALTER TABLE
+        // migrations here if the table ever changes (never drop the user's data).
     }
 
     // Insert one bill row
@@ -62,7 +62,7 @@ public class BillDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(
                 TABLE_NAME,
-                new String[]{COL_ID, COL_MONTH, COL_FINAL},
+                new String[]{COL_ID, COL_MONTH, COL_UNITS, COL_REBATE, COL_FINAL},
                 null, null, null, null,
                 COL_ID + " DESC"
         );
@@ -78,6 +78,18 @@ public class BillDatabaseHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(id)},
                 null, null, null
         );
+    }
+
+    /** Returns {number of bills, sum of final costs}. */
+    public double[] getStats() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*), IFNULL(SUM(" + COL_FINAL + "), 0) FROM " + TABLE_NAME, null);
+        try {
+            if (c.moveToFirst()) return new double[]{c.getDouble(0), c.getDouble(1)};
+            return new double[]{0, 0};
+        } finally {
+            c.close();
+        }
     }
 
     // UPDATE (New Requirement)

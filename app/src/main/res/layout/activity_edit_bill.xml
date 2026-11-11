@@ -1,57 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
+    android:background="?android:attr/colorBackground"
     android:orientation="vertical"
-    android:background="@color/backgroundLight">
+    tools:context=".EditBillActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edit Details"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorPrimary"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView android:text="Month" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <Spinner
-        android:id="@+id/editSpinnerMonth"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:navigationContentDescription="@string/cd_back"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:titleTextAppearance="?attr/textAppearanceTitleLarge" />
 
-    <TextView android:text="Units (kWh)" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <EditText
-        android:id="@+id/editEtUnits"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:scrollbars="none">
 
-    <TextView android:text="Rebate (%)" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <Spinner
-        android:id="@+id/editSpinnerRebate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="24dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    <TextView
-        android:id="@+id/editTvError"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/errorRed"
-        android:visibility="gone"
-        android:layout_marginBottom="16dp"/>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardEdit"
+                style="@style/Widget.EBE.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/btnEditSave"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save Changes"
-        android:backgroundTint="@color/colorPrimary"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/label_month">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/editDropdownMonth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/editTilUnits"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="@string/label_units"
+                        app:suffixText="@string/suffix_kwh">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editEtUnits"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:imeOptions="actionDone"
+                            android:inputType="number"
+                            android:maxLength="7"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/label_rebate"
+                            android:textAppearance="?attr/textAppearanceLabelLarge" />
+
+                        <TextView
+                            android:id="@+id/editTvRebateValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0%"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="?attr/colorPrimary"
+                            android:textStyle="bold"
+                            tools:ignore="HardcodedText" />
+                    </LinearLayout>
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/editSliderRebate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/label_rebate"
+                        android:stepSize="1"
+                        android:value="0"
+                        android:valueFrom="0"
+                        android:valueTo="5" />
+
+                    <TextView
+                        android:id="@+id/editTvPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorPrimary"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditSave"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/btn_save_changes"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="30dp"
+                app:icon="@drawable/ic_save"
+                app:iconGravity="textStart" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

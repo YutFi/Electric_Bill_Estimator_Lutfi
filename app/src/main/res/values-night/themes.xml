@@ -1,7 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ElectricBillEstimator" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-    </style>
+    <!-- Colours come from values-night/colors.xml, so the base theme is reused as-is. -->
+    <style name="Theme.ElectricBillEstimator" parent="Base.Theme.ElectricBillEstimator" />
 </resources>

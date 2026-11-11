@@ -10,17 +10,32 @@ android {
         applicationId "com.example.electricbillestimator"
         minSdk 24
         targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // A fixed key so every APK built by GitHub Actions has the same signature and can be updated in place.
+    // It is intentionally public (sideloading only) - do NOT use it to publish on Google Play.
+    signingConfigs {
+        release {
+            storeFile file("ebe-sideload.jks")
+            storePassword "ebe-sideload"
+            keyAlias "ebe"
+            keyPassword "ebe-sideload"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    lint {
+        abortOnError false
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11

@@ -1,3 +1,89 @@
 <resources>
     <string name="app_name">E-Bill Estimation</string>
+    <string name="title_main">Electrical Bill Estimation</string>
+    <string name="subtitle_main">Estimate your monthly electricity bill</string>
+    <string name="instructions">Enter month, units (kWh) and rebate % (0-5).</string>
+    <string name="label_month">Month</string>
+    <string name="label_units">Units used (kWh)</string>
+    <string name="hint_units">e.g. 250</string>
+    <string name="suffix_kwh">kWh</string>
+    <string name="label_rebate">Rebate (%)</string>
+    <string name="btn_calculate">Calculate and Save</string>
+    <string name="btn_history">View Monthly History</string>
+    <string name="btn_about">About</string>
+    <string name="result_final_label">Final cost</string>
+    <string name="result_placeholder">Enter your units to see the estimate</string>
+    <string name="result_total_label">Total charges</string>
+    <string name="result_saved_label">Rebate saved</string>
+    <string name="result_avg_label">Avg per kWh</string>
+    <string name="result_breakdown">Where your money goes</string>
+    <string name="msg_saved">Calculation saved successfully!</string>
+    <string name="msg_save_error">Error saving to database.</string>
+    <string name="action_view">View</string>
+
+    <string name="title_history">Monthly History</string>
+    <string name="history_hint">Tap any item to see full details. From there, you can Edit or Delete the record.</string>
+    <string name="history_empty_title">No bills saved yet</string>
+    <string name="history_empty_text">Calculate a bill and it is saved here automatically.</string>
+    <string name="stat_records">Records</string>
+    <string name="stat_total">Total paid</string>
+    <string name="stat_average">Average</string>
+
+    <string name="title_detail">Bill Details</string>
+    <string name="detail_month">Month</string>
+    <string name="detail_units">Units used</string>
+    <string name="detail_total">Total charges</string>
+    <string name="detail_rebate">Rebate</string>
+    <string name="detail_final">Final cost</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_delete">Delete</string>
+    <string name="dialog_delete_title">Delete Bill</string>
+    <string name="dialog_delete_message">Are you sure you want to delete this record? This cannot be undone.</string>
+    <string name="dialog_yes">Yes, delete</string>
+    <string name="dialog_no">Keep it</string>
+    <string name="msg_deleted">Bill deleted.</string>
+    <string name="msg_delete_failed">Delete failed.</string>
+    <string name="msg_load_error">Error loading bill.</string>
+
+    <string name="title_edit">Edit Bill</string>
+    <string name="btn_save_changes">Save Changes</string>
+    <string name="msg_updated">Bill Updated Successfully!</string>
+    <string name="msg_update_failed">Update failed.</string>
+    <string name="msg_not_found">Record not found.</string>
+    <string name="preview_final">Final cost: %1$s</string>
+
+    <string name="title_about">About</string>
+    <string name="about_developer_profile">Developer profile</string>
+    <string name="about_name">ARIFF LUTFI BIN SHAHRIM</string>
+    <string name="about_student_id">Student ID: 2023449462</string>
+    <string name="about_course_code_label">Course Code</string>
+    <string name="about_course_code">ICT602</string>
+    <string name="about_course">Mobile Technology And Development</string>
+    <string name="about_how_title">How to use</string>
+    <string name="about_step1">1. Calculate Bill</string>
+    <string name="about_step1_text">Select a month, enter your electricity units (kWh), and choose a rebate %. Tap \'Calculate\' to see the cost and save it automatically.</string>
+    <string name="about_step2">2. View History</string>
+    <string name="about_step2_text">Tap \'View Monthly History\' to see a list of all your saved bills.</string>
+    <string name="about_step3">3. Edit or Delete</string>
+    <string name="about_step3_text">Tap any item in the history list to view full details. From there, you can Edit or Delete the record.</string>
+    <string name="about_tariff_title">Tariff used (RM per kWh)</string>
+    <string name="about_tariff_note">This is an estimate. It does not include taxes, fixed charges or other items your electricity provider may add, so your real bill can differ.</string>
+    <string name="about_web_link">Open the web version</string>
+    <string name="about_source_link">View source on GitHub</string>
+    <string name="about_copyright">© 2025 ARIFF LUTFI BIN SHAHRIM.\nAll rights reserved.</string>
+
+    <string name="err_units_empty">Please enter units used.</string>
+    <string name="err_units_invalid">Invalid number. Use whole numbers only, e.g. 250.</string>
+    <string name="err_units_negative">Units cannot be negative.</string>
+    <string name="err_units_too_high">That looks too high. Please enter 1,000,000 kWh or less.</string>
+    <string name="cd_logo">Electricity logo</string>
+    <string name="cd_developer_photo">Photo of the developer</string>
+    <string name="cd_back">Back</string>
+
+    <string-array name="tier_names">
+        <item>First 200 kWh</item>
+        <item>Next 100 kWh</item>
+        <item>Next 300 kWh</item>
+        <item>Above 600 kWh</item>
+    </string-array>
 </resources>

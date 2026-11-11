@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#5EEAD4</color>
+    <color name="colorPrimaryDark">#00382F</color>
+    <color name="primaryContainer">#00504A</color>
+    <color name="onPrimaryContainer">#B2F0E6</color>
+    <color name="secondaryContainer">#4A3900</color>
+    <color name="onSecondaryContainer">#FFE9A8</color>
+    <color name="backgroundLight">#07110F</color>
+    <color name="surfaceLight">#12221F</color>
+    <color name="textPrimary">#E6F4F1</color>
+    <color name="textMuted">#8FB0A8</color>
+    <color name="errorRed">#FF8A80</color>
+    <color name="headerStart">#0F766E</color>
+    <color name="headerEnd">#064E45</color>
+</resources>
