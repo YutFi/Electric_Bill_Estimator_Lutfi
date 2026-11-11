@@ -56,9 +56,26 @@ jobs:
           name: E-Bill-Estimator-apk
           path: dist/E-Bill-Estimator.apk
 
-      - name: Publish GitHub Release (tags only)
+      # Pushing a tag (v*) publishes a release for that tag.
+      - name: Publish GitHub Release (version tag)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: dist/E-Bill-Estimator.apk
           generate_release_notes: true
+
+      # Pushing to main keeps the "v2.0" release (and its APK) up to date, so the download link always works.
+      - name: Publish / refresh release v2.0 (main)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.0
+          target_commitish: ${{ github.sha }}
+          name: E-Bill Estimator 2.0
+          make_latest: true
+          files: dist/E-Bill-Estimator.apk
+          body: |
+            Android APK for E-Bill Estimator 2.0 (Material 3, animations, dark mode).
+            Download `E-Bill-Estimator.apk`, allow installs from your browser/file manager, then open it.
+            If you have the old app installed, uninstall it first (this build uses a different signing key).
+            Web version: https://yutfi.github.io/Electric_Bill_Estimator_Lutfi/
