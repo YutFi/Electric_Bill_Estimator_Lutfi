@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>E-Bill Estimator – Electricity bill calculator</title>
+  <meta name="description" content="Estimate your monthly electricity bill from kWh used, apply a rebate, and keep a history of your bills. Works on phones, tablets and laptops.">
+  <meta name="theme-color" content="#00796b">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <script>
+    /* Apply saved/system theme before first paint to avoid a flash */
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('ebe.theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header class="top">
+    <a class="brand" href="#calculator" aria-label="E-Bill Estimator home">
+      <svg class="bolt-logo" viewBox="0 0 100 100" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00b8a3"/><stop offset="1" stop-color="#00695c"/></linearGradient></defs>
+        <rect width="100" height="100" rx="24" fill="url(#lg)"/>
+        <path class="bolt" d="M56 12 28 54h20l-5 34 29-44H52l4-32z" fill="#ffc107"/>
+      </svg>
+      <span class="brand-text"><strong>E-Bill Estimator</strong><small>Electricity bill calculator</small></span>
+    </a>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme" title="Switch colour theme">
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+    </button>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Main">
+    <span class="tab-indicator" aria-hidden="true"></span>
+    <button type="button" data-view="calculator">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M8.5 12h2M13.5 12h2M8.5 16h2M13.5 16h2"/></svg>
+      <span>Calculate</span>
+    </button>
+    <button type="button" data-view="history">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.7"/><path d="M4 4v4.7h4.7M12 8v4.2l2.8 1.8"/></svg>
+      <span>History</span><b class="badge" id="history-badge" hidden>0</b>
+    </button>
+    <button type="button" data-view="about">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/></svg>
+      <span>About</span>
+    </button>
+  </nav>
+
+  <main id="main" tabindex="-1">
+
+    <!-- ============ CALCULATOR ============ -->
+    <section class="view" id="view-calculator" data-title="Calculate">
+      <div class="grid-2">
+        <form class="card form-card" id="calc-form" novalidate autocomplete="off">
+          <h1>Estimate your bill</h1>
+          <p class="lead">Pick a month, enter the units you used (kWh) and choose a rebate. The estimate updates as you type.</p>
+
+          <div class="field">
+            <label for="month">Month</label>
+            <div class="select-wrap">
+              <select id="month" name="month"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="units">Units used (kWh)</label>
+            <div class="input-wrap" id="units-wrap">
+              <input id="units" name="units" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="e.g. 250" aria-describedby="units-error units-hint" maxlength="7">
+              <span class="suffix">kWh</span>
+            </div>
+            <div class="chips" role="group" aria-label="Quick amounts">
+              <button type="button" class="chip" data-units="100">100</button>
+              <button type="button" class="chip" data-units="200">200</button>
+              <button type="button" class="chip" data-units="300">300</button>
+              <button type="button" class="chip" data-units="450">450</button>
+              <button type="button" class="chip" data-units="600">600</button>
+              <button type="button" class="chip" data-units="800">800</button>
+            </div>
+            <p class="hint" id="units-hint">Whole numbers only. You can find this on your meter or your last bill.</p>
+            <p class="error" id="units-error" role="alert" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="rebate">Rebate <output id="rebate-out" for="rebate">0%</output></label>
+            <input id="rebate" name="rebate" type="range" min="0" max="5" step="1" value="0" aria-valuetext="0 percent">
+            <div class="ticks" aria-hidden="true"><span>0%</span><span>1%</span><span>2%</span><span>3%</span><span>4%</span><span>5%</span></div>
+          </div>
+
+          <button class="btn primary" type="submit" id="save-btn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            <span>Calculate &amp; save</span>
+          </button>
+          <p class="hint center">Saved bills stay on this device, in your browser. Nothing is uploaded.</p>
+        </form>
+
+        <aside class="card result-card" id="result" aria-live="polite" aria-label="Bill estimate">
+          <div class="result-empty" id="result-empty">
+            <svg class="empty-art" viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="48" class="ring"/>
+              <path class="bolt" d="M66 22 40 64h19l-4 34 27-42H64l2-34z"/>
+            </svg>
+            <h2>Your estimate appears here</h2>
+            <p>Enter your units to see the total, the rebate and how each tariff block adds up.</p>
+          </div>
+
+          <div class="result-body" id="result-body" hidden>
+            <p class="eyebrow">Final cost <span id="res-rebate-note"></span></p>
+            <p class="big-number"><span class="rm">RM</span><span id="res-final">0.00</span></p>
+            <dl class="mini-stats">
+              <div><dt>Total charges</dt><dd id="res-total">RM 0.00</dd></div>
+              <div><dt>Rebate saved</dt><dd id="res-saved">RM 0.00</dd></div>
+              <div><dt>Average per kWh</dt><dd id="res-avg">RM 0.000</dd></div>
+            </dl>
+
+            <h3>Where your money goes</h3>
+            <div class="stack" id="res-stack" role="img" aria-label="Share of cost by tariff block"></div>
+            <ul class="tiers" id="res-tiers"></ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ HISTORY ============ -->
+    <section class="view" id="view-history" data-title="History" hidden>
+      <div class="section-head">
+        <div>
+          <h1>Monthly history</h1>
+          <p class="lead">Tap a record to see details, edit it or delete it.</p>
+        </div>
+        <button type="button" class="btn ghost" id="export-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.8 12 15.3l4.5-4.5M5 19.5h14"/></svg>
+          <span>Export CSV</span>
+        </button>
+      </div>
+
+      <div id="history-empty" class="card empty-state" hidden>
+        <svg class="empty-art" viewBox="0 0 120 120" aria-hidden="true">
+          <rect x="22" y="26" width="76" height="72" rx="14" class="ring"/>
+          <path d="M40 50h40M40 64h28M40 78h34" class="lines"/>
+        </svg>
+        <h2>No bills saved yet</h2>
+        <p>Calculate a bill and it is saved here automatically.</p>
+        <button type="button" class="btn primary" data-go="calculator"><span>Calculate a bill</span></button>
+      </div>
+
+      <div id="history-content" hidden>
+        <div class="stat-grid" id="stat-grid">
+          <div class="card stat"><span class="stat-label">Records</span><strong data-count="records">0</strong></div>
+          <div class="card stat"><span class="stat-label">Total paid</span><strong data-count="sum" data-prefix="RM ">0</strong></div>
+          <div class="card stat"><span class="stat-label">Average bill</span><strong data-count="avg" data-prefix="RM ">0</strong></div>
+          <div class="card stat"><span class="stat-label">Highest bill</span><strong data-count="max" data-prefix="RM ">0</strong></div>
+        </div>
+
+        <div class="card chart-card">
+          <h2>Latest bills</h2>
+          <div id="chart" class="chart" role="img" aria-label="Bar chart of your latest saved bills"></div>
+        </div>
+
+        <ul class="bill-list" id="bill-list"></ul>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="view" id="view-about" data-title="About" hidden>
+      <div class="grid-2 about-grid">
+        <div class="card">
+          <h1>About this app</h1>
+          <p class="lead">E-Bill Estimator turns the units on your electricity meter into an estimated bill, using a four-block tariff and an optional rebate of 0–5%.</p>
+
+          <h3>How to use it</h3>
+          <ol class="steps">
+            <li><b>Calculate.</b> Select a month, enter your units (kWh) and choose a rebate, then press <em>Calculate &amp; save</em>.</li>
+            <li><b>View history.</b> Open the History tab to see every saved bill, with a chart of the latest ones.</li>
+            <li><b>Edit or delete.</b> Tap any record to see full details, then edit or delete it.</li>
+          </ol>
+
+          <h3>Tariff used</h3>
+          <div class="table-wrap">
+            <table class="tariff">
+              <thead><tr><th scope="col">Block</th><th scope="col">Rate (RM per kWh)</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">First 200 kWh (1–200)</th><td>0.218</td></tr>
+                <tr><th scope="row">Next 100 kWh (201–300)</th><td>0.334</td></tr>
+                <tr><th scope="row">Next 300 kWh (301–600)</th><td>0.516</td></tr>
+                <tr><th scope="row">Above 600 kWh (601+)</th><td>0.546</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="hint">This is an <strong>estimate</strong> built from the rates above. It does not include taxes, fixed charges or other items your electricity provider may add, so your real bill can differ.</p>
+
+          <h3>Get the app</h3>
+          <div class="btn-row">
+            <a class="btn primary" id="apk-link" href="https://github.com/YutFi/Electric_Bill_Estimator_Lutfi/releases/latest" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.8 12 15.3l4.5-4.5M5 19.5h14"/></svg>
+              <span>Download Android APK</span>
+            </a>
+            <button type="button" class="btn ghost" id="install-btn" hidden><span>Install this web app</span></button>
+          </div>
+        </div>
+
+        <div class="card dev-card">
+          <p class="eyebrow">Developer profile</p>
+          <img class="avatar" src="assets/developer.jpg" alt="Photo of Ariff Lutfi Bin Shahrim" width="140" height="160" loading="lazy">
+          <h2>Ariff Lutfi Bin Shahrim</h2>
+          <dl class="facts">
+            <div><dt>Student ID</dt><dd>2023449462</dd></div>
+            <div><dt>Course code</dt><dd>ICT602</dd></div>
+            <div><dt>Course</dt><dd>Mobile Technology And Development</dd></div>
+          </dl>
+          <a class="btn ghost" href="https://github.com/YutFi/Electric_Bill_Estimator_Lutfi" target="_blank" rel="noopener"><span>View source on GitHub</span></a>
+          <p class="hint center">&copy; 2025 Ariff Lutfi Bin Shahrim. All rights reserved.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <dialog id="dialog" aria-labelledby="dlg-title"></dialog>
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+  <noscript><p class="noscript">This app needs JavaScript to calculate and save your bills. Please enable it in your browser.</p></noscript>
+  <script src="js/tariff.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
